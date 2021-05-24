@@ -84,21 +84,9 @@ export class HomeComponent implements OnInit{
     ];
   
     refresh: Subject<any> = new Subject();
-  
+  //Events or Songs that will be shown as events 
     events: CalendarEvent[] = [
-      // {
-      //   start: subDays(startOfDay(new Date()), 1),
-      //   end: addDays(new Date(), 1),
-      //   title: 'A 3 day event',
-      //   color: colors.red,
-      //   actions: this.actions,
-      //   allDay: true,
-      //   resizable: {
-      //     beforeStart: true,
-      //     afterEnd: true,
-      //   },
-      //   draggable: true,
-      // },
+
       {
         start: startOfDay(new Date()),
         title: 'An event with no end date',
@@ -110,25 +98,6 @@ export class HomeComponent implements OnInit{
         // actions: this.actions,
         // draggable: true,
       },
-      // {
-      //   start: subDays(endOfMonth(new Date()), 3),
-      //   end: addDays(endOfMonth(new Date()), 3),
-      //   title: 'A long event that spans 2 months',
-      //   color: colors.blue,
-      //   allDay: true,
-      // },
-      // {
-      //   start: addHours(startOfDay(new Date()), 2),
-      //   end: addHours(new Date(), 2),
-      //   title: 'A draggable and resizable event',
-      //   color: colors.yellow,
-      //   actions: this.actions,
-      //   resizable: {
-      //     beforeStart: true,
-      //     afterEnd: true,
-      //   },
-      //   draggable: true,
-      // },
     ];
     dayToday: Date = new Date();
     activeDayIsOpen: boolean = true;
@@ -138,6 +107,7 @@ export class HomeComponent implements OnInit{
       private songsService:SongsService,
       public dialog: MatDialog,
       private formBuilder: FormBuilder,) {
+        //Get Songs from service and push to event array
         this.songsService.getSongs().subscribe(res => {
           this.songs = res
           this.songs.forEach(element => {
@@ -159,18 +129,17 @@ export class HomeComponent implements OnInit{
   ngOnInit(){
     
     this.viewDate = new Date();
+    //Pop-up dialog if there is a song releised today(now) search from 
+    //events to get the right event 
     for(let i = 0 ; i< this.events.length; i++){
-      
       let eventStart = (this.events[i].start).toString().substring(0, 15);
       let now = this.viewDate.toString().substring(0, 15);
-
       if(eventStart == now){
         this.today(this.viewDate,this.events[i])
       }
     }
-  //  this.refreshView()
   }
-
+//Open dialog if song relised is today
   today(date,events): void {
       // debugger
       console.log(events)
@@ -182,7 +151,9 @@ export class HomeComponent implements OnInit{
         }
       }
     }
-  
+  //Day clicked ,if its today and click close expand else if click to 
+  //a calendar day that has no data open add dialog ,else if click to a 
+  //song relised calendar day open expand box
     dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
      
       if (isSameMonth(date, this.viewDate)) {
@@ -207,7 +178,7 @@ export class HomeComponent implements OnInit{
         this.viewDate = date;
       }
     }
-  
+  //Change day of released if u drang and drop a date
     eventTimesChanged({
       event,
       newStart,
@@ -225,6 +196,7 @@ export class HomeComponent implements OnInit{
       });
       this.handleEvent('Dropped or resized', event);
     }
+    //Open song/songs detail dialog 
   openDialog(data){
  
     this.dialog.open(SongDialogComponent, {
@@ -233,6 +205,8 @@ export class HomeComponent implements OnInit{
       data: data
     });
   }
+  //Open song add or modify dialog and gets back the data that have been added or 
+  //modified and add those data to addEvent that create a new song
     handleEvent(action: string, event: CalendarEvent<any>): void {
       this.modalData = { event, action };
       this.dialog.open(AddModSongsComponent, {
@@ -244,7 +218,7 @@ export class HomeComponent implements OnInit{
       });
      // this.modal.open(this.modalContent, { size: 'lg' });
     }
-  
+  //Create a new song /event (add to array of events)
     addEvent(res): void {
       this.events = [
         ...this.events,
@@ -256,7 +230,7 @@ export class HomeComponent implements OnInit{
         },
       ];
     }
-  
+  //Delete event
     deleteEvent(eventToDelete: CalendarEvent) {
       this.events = this.events.filter((event) => event !== eventToDelete);
     }
@@ -264,10 +238,7 @@ export class HomeComponent implements OnInit{
     setView(view: CalendarView) {
       this.view = view;
     }
-    // refreshView(){
-    //   console.log('hynnn')
-    //  return this.day.viewDate = this.viewDate
-    // }
+
   
     closeOpenMonthViewDay() {
       this.activeDayIsOpen = false;
